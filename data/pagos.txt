@@ -1,0 +1,15 @@
+Medios de Pago FibraNet
+
+Formas de pago disponibles:
+- Webpay (tarjeta de credito o debito) en www.fibranet.cl/pagos
+- Transferencia bancaria: Banco Estado, cuenta corriente 12345678, RUT empresa 76.123.456-7, email pagos@fibranet.cl
+- Caja Vecina y ServiPag con el numero de cliente
+- Pago presencial en sucursales FibraNet
+
+Fecha de vencimiento: dia 15 de cada mes. Despues del dia 20 se aplica un recargo por mora de $2.000 CLP.
+
+Si el cliente tiene mas de 60 dias de deuda, el servicio se suspende automaticamente. Para reconectar se debe pagar el total adeudado. La reconexion es automatica dentro de 2 horas habiles tras confirmar el pago.
+
+Boletas: se envian al correo electronico registrado del cliente el dia 1 de cada mes. Si no recibio su boleta, puede solicitarla por WhatsApp o descargarla desde el portal de clientes.
+
+Convenio de pago: clientes con deuda acumulada pueden solicitar un convenio de pago en cuotas contactando al area comercial. Maximo 3 cuotas sin interes.

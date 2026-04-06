@@ -1,0 +1,101 @@
+[
+  {
+    "rut": "12345678-5",
+    "name": "Juan Perez Soto",
+    "email": "juan.perez@email.com",
+    "phone": "+56912345678",
+    "address": "Av. Principal 123, Santiago",
+    "plan": "Plan Hogar 600 Mbps",
+    "status": "active",
+    "monthly_fee": 17990,
+    "balance": 0,
+    "invoices": []
+  },
+  {
+    "rut": "11111111-1",
+    "name": "Maria Rodriguez Muñoz",
+    "email": "maria.rod@email.com",
+    "phone": "+56987654321",
+    "address": "Calle Los Robles 456, Valparaiso",
+    "plan": "Plan Premium 1000 Mbps",
+    "status": "active",
+    "monthly_fee": 24990,
+    "balance": 49980,
+    "invoices": [
+      {
+        "id": "INV-2024-001",
+        "amount": 24990,
+        "due_date": "2024-11-15",
+        "status": "overdue"
+      },
+      {
+        "id": "INV-2024-002",
+        "amount": 24990,
+        "due_date": "2024-12-15",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "rut": "22222222-2",
+    "name": "Carlos Gonzalez Tapia",
+    "email": "carlos.gt@email.com",
+    "phone": "+56955556666",
+    "address": "Pasaje Las Flores 789, Concepcion",
+    "plan": "Plan Basico 300 Mbps",
+    "status": "suspended",
+    "monthly_fee": 12990,
+    "balance": 38970,
+    "invoices": [
+      {
+        "id": "INV-2024-009",
+        "amount": 12990,
+        "due_date": "2024-09-15",
+        "status": "overdue"
+      },
+      {
+        "id": "INV-2024-010",
+        "amount": 12990,
+        "due_date": "2024-10-15",
+        "status": "overdue"
+      },
+      {
+        "id": "INV-2024-011",
+        "amount": 12990,
+        "due_date": "2024-11-15",
+        "status": "overdue"
+      }
+    ]
+  },
+  {
+    "rut": "15432189-6",
+    "name": "Ana Morales Vega",
+    "email": "ana.morales@email.com",
+    "phone": "+56944443333",
+    "address": "Av. Libertad 321, Temuco",
+    "plan": "Plan Hogar 600 Mbps",
+    "status": "active",
+    "monthly_fee": 17990,
+    "balance": 17990,
+    "invoices": [
+      {
+        "id": "INV-2024-012",
+        "amount": 17990,
+        "due_date": "2024-12-15",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "rut": "8765432-K",
+    "name": "Roberto Silva Contreras",
+    "email": "roberto.silva@email.com",
+    "phone": "+56933332222",
+    "address": "Calle Comercio 567, La Serena",
+    "plan": "Plan Premium 1000 Mbps",
+    "status": "active",
+    "monthly_fee": 24990,
+    "balance": 0,
+    "invoices": []
+  }
+]

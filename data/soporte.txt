@@ -1,0 +1,17 @@
+Soporte Tecnico FibraNet
+
+Horario de atencion: lunes a viernes de 09:00 a 19:00 hrs, sabados de 09:00 a 14:00 hrs. Domingos y festivos no hay atencion presencial, solo soporte remoto via WhatsApp.
+
+Canales de contacto:
+- WhatsApp: +56 9 1234 5678
+- Call center: 600 123 4567
+- Email: soporte@fibranet.cl
+
+Costo de visita tecnica: $10.000 CLP solo si el problema fue causado por manipulacion o negligencia del cliente. Sin costo si es responsabilidad de FibraNet.
+
+Tiempo de respuesta para visitas en terreno: 24 a 48 horas habiles segun disponibilidad tecnica y demanda de la zona.
+
+Problemas comunes y solucion remota:
+- Sin conexion: reiniciar el router desconectando el cable de poder por 30 segundos.
+- Velocidad lenta: verificar que el dispositivo esta conectado por cable ethernet o cerca del router. La velocidad por WiFi depende de la distancia y obstaculos.
+- Luz roja en el router (LOS): indica corte de fibra. Requiere visita tecnica, no tiene costo para el cliente.
