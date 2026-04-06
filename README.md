@@ -113,10 +113,10 @@ curl -X POST http://localhost:8000/chat \
   -d '{"message": "hola", "provider": "invalido", "model": "x", "session_id": "test2"}'
 ```
 
-## Bonus (opcional, suma puntos)
+## Bonus (opcional)
 
-- Frontend simple: una pagina HTML con un chat que consuma el endpoint SSE y muestre los tokens en tiempo real
 - Poder comparar respuestas: enviar el mismo mensaje a 2 proveedores en paralelo y ver ambas respuestas
+- Frontend simple: una pagina HTML con un chat que consuma el endpoint SSE y muestre los tokens en tiempo real
 - Docker: `docker compose up` para levantar todo
 
 ## Entregables
@@ -125,16 +125,6 @@ curl -X POST http://localhost:8000/chat \
 2. `requirements.txt` con todas las dependencias
 3. `.env.example` documentando las API keys necesarias (no commitear el `.env` real)
 4. Commits descriptivos que muestren el progreso del desarrollo
-
-## Criterios de Evaluacion
-
-| Criterio | Peso |
-|---|---|
-| Funcionalidad (streaming + multiples proveedores) | 30% |
-| Calidad de codigo (modular, limpio, sin codigo muerto) | 25% |
-| Integracion correcta de SDKs (leer docs e implementar) | 20% |
-| Manejo de errores | 15% |
-| Git (commits claros, progresivos) | 10% |
 
 ## Stack
 
