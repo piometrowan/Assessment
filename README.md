@@ -2,134 +2,170 @@
 
 ## Contexto
 
-En Metroia desarrollamos agentes de IA para soporte al cliente de ISPs (proveedores de internet). Nuestros agentes atienden consultas por WhatsApp, buscan informacion en bases de conocimiento, consultan datos de clientes, y transfieren a agentes humanos cuando es necesario.
+En Metroia construimos backends que integran multiples proveedores de LLMs para agentes de IA en produccion. Trabajamos con APIs de diferentes proveedores, streaming en tiempo real, y arquitecturas modulares que permiten intercambiar modelos facilmente.
 
-Este reto simula una version simplificada de lo que hacemos en produccion.
+Este reto evalua tu capacidad para leer documentacion, integrar APIs, y construir un backend funcional con streaming.
 
 ## El Reto
 
-Construir un agente conversacional de soporte para **FibraNet**, un ISP ficticio. El agente debe atender consultas de clientes usando RAG (Retrieval-Augmented Generation) para informacion de la empresa y herramientas (tools) para consultar datos de clientes.
+Construir un backend en Python que exponga una API de chat con streaming, integrando al menos **2 de los 3 proveedores gratuitos** listados abajo.
 
-## Datos Proporcionados
+## Proveedores (todos tienen tier gratuito)
 
-En la carpeta `data/` encontraras:
+### Groq
+- Consola: https://console.groq.com
+- Documentacion: https://console.groq.com/docs/quickstart
+- SDK: `groq`
+- Modelos gratuitos: `llama-3.3-70b-versatile`, `gemma2-9b-it`, `llama-3.1-8b-instant`
 
-- `planes.txt` - Planes de internet disponibles con precios y caracteristicas
-- `soporte.txt` - Informacion de soporte tecnico, horarios y canales de contacto
-- `pagos.txt` - Medios de pago, fechas de vencimiento y politicas de mora
-- `customers.json` - Base de datos mock de clientes con RUT, plan, estado y deuda
+### Cerebras
+- Consola: https://cloud.cerebras.ai
+- Documentacion: https://inference-docs.cerebras.ai/introduction
+- SDK: `cerebras-cloud-sdk`
+- Modelos gratuitos: `llama-3.3-70b`, `llama-3.1-8b`
+
+### OpenRouter
+- Consola: https://openrouter.ai
+- Documentacion: https://openrouter.ai/docs/quickstart
+- SDK: compatible con `openai` (cambiando base_url)
+- Modelos gratuitos: buscar modelos con precio $0 en https://openrouter.ai/models
 
 ## Requerimientos
 
-### 1. RAG (Retrieval-Augmented Generation)
+### 1. API Backend (FastAPI)
 
-Cargar los 3 archivos de texto como base de conocimiento:
-- Dividirlos en chunks apropiados
-- Generar embeddings y almacenarlos en un vector store local (FAISS, Chroma, o similar)
-- Implementar busqueda por similitud para responder consultas
+**`POST /chat`** - Enviar mensaje y recibir respuesta en streaming (SSE)
 
-### 2. Herramientas del Agente
+Request body:
+```json
+{
+  "message": "Hola, como estas?",
+  "provider": "groq",
+  "model": "llama-3.3-70b-versatile",
+  "session_id": "abc123"
+}
+```
 
-Implementar las siguientes herramientas (tools) que el agente pueda invocar:
+Response: Server-Sent Events (SSE) con cada token del modelo.
 
-**a) `buscar_cliente(rut: str)`**
-- Busca un cliente en `customers.json` por su RUT
-- Debe validar el RUT chileno usando el algoritmo MOD 11 antes de buscar
-- Retorna: nombre, plan, estado, y deuda pendiente
-- Si el RUT es invalido, retorna error claro
-- Si no encuentra el cliente, sugiere que no esta registrado
+**`GET /models`** - Listar modelos disponibles por proveedor
 
-**b) `consultar_planes(consulta: str)`**
-- Busca en la base de conocimiento los planes disponibles usando RAG
-- Retorna la informacion relevante encontrada
+Response:
+```json
+{
+  "groq": ["llama-3.3-70b-versatile", "gemma2-9b-it"],
+  "cerebras": ["llama-3.3-70b", "llama-3.1-8b"],
+  "openrouter": ["meta-llama/llama-3.3-70b-instruct:free"]
+}
+```
 
-**c) `consultar_info(consulta: str)`**
-- Busca informacion general (soporte, pagos, horarios) usando RAG
-- Retorna la informacion relevante encontrada
+### 2. Streaming
 
-### 3. Agente Conversacional
+Las respuestas del chat deben llegar token por token via SSE (Server-Sent Events). No se acepta esperar la respuesta completa y enviarla de golpe.
 
-Construir el agente usando **LangChain** o **LangGraph** (a eleccion):
-- El agente decide cuando usar cada herramienta segun la consulta del usuario
-- Mantiene contexto de la conversacion (memoria)
-- Responde en espanol de forma clara y amigable
+### 3. Memoria de Conversacion
 
-### 4. Interfaz
+Mantener el historial de mensajes por `session_id` (en memoria, no necesita base de datos). Si el usuario envia varios mensajes con el mismo `session_id`, el modelo debe tener contexto de los mensajes anteriores.
 
-- CLI interactivo: ejecutar `python main.py` para iniciar una conversacion por terminal
-- El usuario escribe, el agente responde, loop hasta que el usuario escriba "salir"
+### 4. Manejo de Errores
 
-### 5. Validacion de RUT (MOD 11)
+- API key invalida o no configurada: error claro con el proveedor afectado
+- Modelo no disponible: error indicando modelos validos
+- Proveedor no soportado: error indicando proveedores disponibles
+- Rate limit del proveedor: error descriptivo
 
-El RUT chileno se valida asi:
-- Tomar el cuerpo numerico (sin digito verificador)
-- Multiplicar cada digito de derecha a izquierda por los factores 2, 3, 4, 5, 6, 7 (ciclicamente)
-- Sumar los productos
-- Calcular: 11 - (suma % 11)
-- Si el resultado es 11, el digito verificador es "0"; si es 10, es "K"; otro valor es el digito directamente
-- Comparar con el digito verificador proporcionado
+### 5. Estructura del Proyecto
 
-Ejemplo: RUT 12.345.678-5 es valido.
-
-## Conversaciones de Prueba
-
-El agente debe manejar correctamente al menos estas conversaciones:
+El codigo debe estar organizado en modulos, no todo en un solo archivo. Estructura sugerida (libre de modificar):
 
 ```
-Usuario: Hola, que planes de internet tienen?
-Agente: [Debe listar los 3 planes con precios]
-
-Usuario: Quiero revisar mi cuenta, mi RUT es 11.111.111-1
-Agente: [Debe mostrar datos de Maria Rodriguez, plan Premium, deuda de $49.980]
-
-Usuario: Como puedo pagar?
-Agente: [Debe explicar los medios de pago disponibles]
-
-Usuario: Mi internet esta lento, que hago?
-Agente: [Debe dar pasos de solucion desde la base de conocimiento]
-
-Usuario: Revisa el RUT 12345679-0
-Agente: [Debe indicar que el RUT es invalido]
+src/
+  main.py          # Entry point, FastAPI app
+  providers/       # Un modulo por proveedor
+    groq.py
+    cerebras.py
+    openrouter.py
+  models.py        # Schemas (Pydantic)
+  memory.py        # Manejo de historial por sesion
 ```
+
+## Pruebas Esperadas
+
+El backend debe responder correctamente a estas llamadas:
+
+```bash
+# Chat con streaming (debe imprimir tokens progresivamente)
+curl -N -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Que es Python en 2 oraciones?", "provider": "groq", "model": "llama-3.3-70b-versatile", "session_id": "test1"}'
+
+# Segundo mensaje con contexto (debe recordar el mensaje anterior)
+curl -N -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Y para que se usa?", "provider": "groq", "model": "llama-3.3-70b-versatile", "session_id": "test1"}'
+
+# Listar modelos
+curl http://localhost:8000/models
+
+# Error: proveedor invalido
+curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "hola", "provider": "invalido", "model": "x", "session_id": "test2"}'
+```
+
+## Bonus (opcional, suma puntos)
+
+- Frontend simple: una pagina HTML con un chat que consuma el endpoint SSE y muestre los tokens en tiempo real
+- Poder comparar respuestas: enviar el mismo mensaje a 2 proveedores en paralelo y ver ambas respuestas
+- Docker: `docker compose up` para levantar todo
 
 ## Entregables
 
-1. Codigo fuente en el repositorio (estructura libre, pero organizada)
-2. El `requirements.txt` puede ser extendido con dependencias adicionales
-3. Un `.env` con la API key necesaria (no commitear, usar `.env.example` como referencia)
+1. Codigo fuente organizado en el repositorio
+2. `requirements.txt` con todas las dependencias
+3. `.env.example` documentando las API keys necesarias (no commitear el `.env` real)
 4. Commits descriptivos que muestren el progreso del desarrollo
 
 ## Criterios de Evaluacion
 
 | Criterio | Peso |
 |---|---|
-| Funcionalidad completa (RAG + tools + agente) | 35% |
-| Calidad de codigo (limpio, modular, sin codigo muerto) | 25% |
-| Implementacion correcta de RAG | 15% |
-| Validacion de RUT y manejo de errores | 15% |
+| Funcionalidad (streaming + multiples proveedores) | 30% |
+| Calidad de codigo (modular, limpio, sin codigo muerto) | 25% |
+| Integracion correcta de SDKs (leer docs e implementar) | 20% |
+| Manejo de errores | 15% |
 | Git (commits claros, progresivos) | 10% |
 
-## Stack Sugerido
+## Stack
 
 - **Python 3.11+**
-- **LLM**: OpenAI GPT-4o-mini (barato y suficiente) o cualquier otro modelo via LangChain
-- **Embeddings**: OpenAI `text-embedding-3-small` o sentence-transformers local
-- **Vector Store**: FAISS (incluido en requirements.txt)
-- **Framework**: LangChain o LangGraph
+- **FastAPI** + **uvicorn**
+- **SSE**: `sse-starlette` o streaming response nativo de FastAPI
+- **SDKs**: `groq`, `cerebras-cloud-sdk`, `openai` (para OpenRouter)
 
 ## Como Empezar
 
 ```bash
-git clone https://github.com/piometrowan/Assessment.git
+# 1. Fork y clonar
+git clone https://github.com/TU_USUARIO/Assessment.git
 cd Assessment
+
+# 2. Entorno virtual
 python -m venv .venv
 source .venv/bin/activate  # Linux/Mac
 # .venv\Scripts\activate   # Windows
+
+# 3. Instalar dependencias
 pip install -r requirements.txt
+
+# 4. Configurar API keys
 cp .env.example .env
-# Editar .env con tu API key
+# Editar .env con tus API keys (registrarse en los proveedores, todos son gratis)
+
+# 5. Ejecutar
+uvicorn src.main:app --reload
 ```
 
 ## Entrega
 
-Hacer fork del repositorio, desarrollar la solucion, y enviar el link del fork a **pio@metrowan.cl** junto con instrucciones para ejecutar si difieren de lo descrito.
+Hacer fork del repositorio, desarrollar la solucion, y enviar el link del fork a **pio@metrowan.cl**.
